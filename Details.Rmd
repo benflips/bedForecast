@@ -1,0 +1,46 @@
+---
+title: "Untitled"
+author: "Ben Phillips"
+date: "26/03/2020"
+output: html_document
+---
+
+This forecaster has been written in R, and all code is available [here]{}.  The code is licenced under the MIT licence -- free for distribution.  The forecaster has been produced by Ben Phillips (University of Melbourne) and Megan Higgie (James Cook University) in response to a clear need for short-term forecasts.
+
+The forecaster is not a sophisticated process model.  Rather, it takes observed cases over time and uses a series of time series transformations (based on specified parameters) to generate expected case data.  It then fits a simple exponential growth model to these data and (if necessary) extrapolates forward in time.
+
+The exponential model is likely to be reasonble over short time horizons.  Beyond these, a more sophisticated process model would be required.  We note also that the model does not incorporate distributions of parameters, instead using mean fields.  For all of these resaons we feel the model should not be used beyond a ten-day forecast.
+
+## Data transformations
+
+### Active cases 
+
+Our data are cumulative number of diagnosed infections and deaths over time, $I_t$, $D_t$, where time is measured in days.  Given these are diagnosed cases, we assume they are observed at day of illness onset (rather than day of infection).  We convert these data to observed active cases at time $t$, $A^o_t$ by: $A^o_t=I_t-D_t-(I_{t-22}-D_{t-22})$.  This assumes that infections not resulting in death are resolved at 22 days post onset.
+
+### Detection
+
+Not all cases are detected at onset, and so raw active cases are lower than the true number of cases.  Detection rate can be estimated by assuming that deaths do not go undetected, that there is a case fatality rate for symtpomatic cases (here assumed to be 3.3\%), and that there is a fixed time (here assumed to be 17 days) between onset and death.  Observed new cases at time $t$ are calculated as $N^o_t = A^o_t-A^o_{t-1}$, and under the previous assumptions, the expected number of new cases $\hat{N_t} = D_{t+17}/0.033$.  We then estimate detection probability, $p$, as the mean over $t$ of $N_t/\hat{N_t}$.  Once we have detection we can define "true" number of active cases as $A_t = A^o_t/p$.
+
+### Case partitioning
+
+We partition new cases into those that are going to progress to severe (needing a hospital bed), and those that are going to progress to critical (requiring an ICU bed) according to fixed proportions, $\alpha_s$ and $\alpha_c$.  The remaining fraction of cases (mild cases not requiring hospitalisation) are ignored.
+
+#### Ward beds
+
+We assume that both severe and critical cases progress to hospitalisation after $h$ days, and that patients are either discharged (severe) of progress to ICU (critical) at $h+6$ days.  Thus, the number of patients requiring ward beds at time $t$ is $S_t = (\alpha_s + \alpha_c)\sum_{t-h-6}^{t-h}N_t$.
+
+#### ICU beds
+
+Similar logic sees $\alpha_c$ cases progress to ICU beds at $h+6$ days from ilness onset and staying in ICU (until death or discharge) until $h+6+i$ days from ilness onset.  Thus, the number of patients requiring ICU beds, $C_t = alpha_c\sum_{t-h-6-i}^{t-h-6}N_t$.
+
+## Growth model
+
+The above disease progression model describes translations that are made to the raw data to generated measures of case load at given times.  We assume that these case loads follow an exponential growth model such that $E(C_t) = C_0e^{r_ct}$ and $E(S_t) = S_0e^{r_st}$.  In reality, the growth dynamics are much more complex than this, but for short time periods the exponential model may provide a reasoable approximation.  
+
+We fit this exponential model to the last ten days of transformed data and (if necessary) extrapolate the fitted model to capture ten day into the future from now.  Fititng is effected against the log-transformaed model and log of case numbers back-transformed to the original scale.
+
+## Sensitivity
+
+We note a considerable number of assumptions in even this very simplified description of the disease dynamics.  We could produce more finely-tuned and less assumption-ridden predictions given daily updated data on real case load statewide.  Although there are many assumptions, the numbers chosen to describe disease progression are consistent with published figures.  We provide sliders that capture the range of published figures and set default values to a qualitative "best estimate" across studies.  The user is able to see the effect of each of these assumptions on case load simply by moving the sliders.
+
+Of the various parameters, detection has a large effect on case numbers; essentialy lifting or dropping the entire curve.  Thus, a user that know today's ICU load can tweak detection until case load matches today's ICU numbers and have a sense of how ICU numbers might progress from there. When the app is initialised (or website is refreshed), detection is set to today's best estimate of detection from data at the national (rather than State) level.
