@@ -5,7 +5,7 @@ date: "26/03/2020"
 output: html_document
 ---
 
-This forecaster has been written in R, and all code is available [here]{}.  The code is licenced under the MIT licence -- free for distribution.  The forecaster has been produced by Ben Phillips (University of Melbourne) and Megan Higgie (James Cook University) in response to a clear need for short-term forecasts.
+This forecaster has been written in R, and all code is available [here](https://github.com/benflips/bedForecast).  The code is licenced under the MIT licence -- free for distribution.  The forecaster has been produced by Ben Phillips (University of Melbourne) and Megan Higgie (James Cook University) in response to a clear need for short-term forecasts.
 
 The forecaster is not a sophisticated process model.  Rather, it takes observed cases over time and uses a series of time series transformations (based on specified parameters) to generate expected case data.  It then fits a simple exponential growth model to these data and (if necessary) extrapolates forward in time.
 
@@ -19,7 +19,7 @@ Our data are cumulative number of diagnosed infections and deaths over time, $I_
 
 ### Detection
 
-Not all cases are detected at onset, and so raw active cases are lower than the true number of cases.  Detection rate can be estimated by assuming that deaths do not go undetected, that there is a case fatality rate for symtpomatic cases (here assumed to be 3.3\%), and that there is a fixed time (here assumed to be 17 days) between onset and death.  Observed new cases at time $t$ are calculated as $N^o_t = A^o_t-A^o_{t-1}$, and under the previous assumptions, the expected number of new cases $\hat{N_t} = D_{t+17}/0.033$.  We then estimate detection probability, $p$, as the mean over $t$ of $N_t/\hat{N_t}$.  Once we have detection we can define "true" number of active cases as $A_t = A^o_t/p$.
+Not all cases are detected at onset, and so raw active cases are lower than the true number of cases.  Detection rate can be estimated by assuming that deaths do not go undetected, that there is a case fatality rate for symtpomatic cases (here assumed to be 3.3%), and that there is a fixed time (here assumed to be 17 days) between onset and death.  Observed new cases at time $t$ are calculated as $N^o_t = A^o_t-A^o_{t-1}$, and under the previous assumptions, the expected number of new cases $\hat{N_t} = D_{t+17}/0.033$.  We then estimate detection probability, $p$, as the mean over $t$ of $N_t/\hat{N_t}$.  Once we have detection we can define "true" number of active cases as $A_t = A^o_t/p$.
 
 ### Case partitioning
 
@@ -31,7 +31,7 @@ We assume that both severe and critical cases progress to hospitalisation after 
 
 #### ICU beds
 
-Similar logic sees $\alpha_c$ cases progress to ICU beds at $h+6$ days from ilness onset and staying in ICU (until death or discharge) until $h+6+i$ days from ilness onset.  Thus, the number of patients requiring ICU beds, $C_t = alpha_c\sum_{t-h-6-i}^{t-h-6}N_t$.
+Similar logic sees $\alpha_c$ cases progress to ICU beds at $h+6$ days from ilness onset and staying in ICU (until death or discharge) until $h+6+i$ days from ilness onset.  Thus, the number of patients requiring ICU beds, $C_t = \alpha_c\sum_{t-h-6-i}^{t-h-6}N_t$.
 
 ## Growth model
 

@@ -1,0 +1,12 @@
+name: bedLimits
+title: bedLimits
+username:
+account: benflips
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1999694
+bundleId: 2956703
+url: https://benflips.shinyapps.io/bedLimits/
+when: 1585788535.1447
+asMultiple: FALSE
+asStatic: FALSE
