@@ -40,15 +40,15 @@ shinyServer(function(input, output) {
          ylab = yTxt,
          main = paste("Ward beds,", input$stateFinderHosp))
     axis(side = 4)
-    lines(projSev$y[, "fit"]~projSev$x, lty = 1)
-    lines(projSev$y[, "lwr"]~projSev$x, lty = 2)
-    lines(projSev$y[, "upr"]~projSev$x, lty = 2)
+    # lines(projSev$y[, "fit"]~projSev$x, lty = 1)
+    # lines(projSev$y[, "lwr"]~projSev$x, lty = 2)
+    # lines(projSev$y[, "upr"]~projSev$x, lty = 2)
   })
   
   # ##### Critical by day #####
   output$critPlot <-renderPlot({
     yH <- tLate()
-    projCrit <- projSimple(yH$critical, yH$icuDate, inWindow = input$timeToHosp+6, extWindow = 5)
+    projCrit <- projSimple(yH$critical, yH$icuDate, inWindow = input$timeToHosp+6, extWindow = 2)
     yMax <- max(c(projCrit$y[,"fit"], yH$critical), na.rm = TRUE)
     yTxt <- "Critical cases (ICU Beds)"
     plot(yH$critical~yH$icuDate,
@@ -60,10 +60,9 @@ shinyServer(function(input, output) {
          ylab = yTxt,
          main = paste("ICU Beds,", input$stateFinderHosp))
     axis(side = 4)
-    lines(projCrit$y[, "fit"]~projCrit$x, lty = 1)
-    lines(projCrit$y[, "lwr"]~projCrit$x, lty = 2)
-    lines(projCrit$y[, "upr"]~projCrit$x, lty = 2)
-    #abline(b = 0, a = beds$ICUBeds[beds$state==input$stateFinderHosp]*(input$percAvail/100), lwd = 3, col = "red")
+    # lines(projCrit$y[, "fit"]~projCrit$x, lty = 1)
+    # lines(projCrit$y[, "lwr"]~projCrit$x, lty = 2)
+    # lines(projCrit$y[, "upr"]~projCrit$x, lty = 2)
   })
   
   output$dDay <- renderText({
@@ -77,7 +76,7 @@ shinyServer(function(input, output) {
   output$caseTab <- renderTable({
     yH <-tLate()
     projSev <- projSimple(yH$severe, yH$hDate, extWindow = 5)
-    projCrit <- projSimple(yH$critical, yH$icuDate, inWindow = input$timeToHosp+6, extWindow = 5)
+    projCrit <- projSimple(yH$critical, yH$icuDate, inWindow = input$timeToHosp+6, extWindow = 2)
     sevSS <- which(projSev$x==Sys.Date())
     sevSS <-sevSS:(sevSS+10)
     sevSS <- sevSS[sevSS<=nrow(projSev$y)]
