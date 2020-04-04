@@ -75,18 +75,14 @@ shinyServer(function(input, output) {
   
   output$caseTab <- renderTable({
     yH <-tLate()
-    projSev <- projSimple(yH$severe, yH$hDate, extWindow = 5)
-    projCrit <- projSimple(yH$critical, yH$icuDate, inWindow = input$timeToHosp+6, extWindow = 2)
-    sevSS <- which(projSev$x==Sys.Date())
-    sevSS <-sevSS:(sevSS+10)
-    sevSS <- sevSS[sevSS<=nrow(projSev$y)]
-    critSS <- which(projCrit$x==Sys.Date())
-    critSS <-critSS:(critSS+10)
-    sevSS <- sevSS[sevSS<=nrow(projCrit$y)]
-    minPred <-min(length(sevSS), length(critSS))
-    if (length(sevSS)>minPred) sevSS <- sevSS[1:minPred]
-    if (length(critSS)>minPred) critSS <- critSS[1:minPred]
-    data.frame(Date = format(projSev$x[sevSS], "%d/%m"), "Ward beds" = projSev$y[sevSS, "fit"], "ICU beds" = projCrit$y[critSS, "fit"])
+    #projSev <- projSimple(yH$severe, yH$hDate, extWindow = 5)
+    #projCrit <- projSimple(yH$critical, yH$icuDate, inWindow = input$timeToHosp+6, extWindow = 2)
+    sevSS <- which(yH$hDate==Sys.Date())
+    sevSS <-sevSS:length(yH$hDate)
+    critSS <- which(yH$icuDate==Sys.Date())
+    critSS <-critSS:length(yH$icuDate)
+    wBeds <- c(yH$severe[sevSS], rep(NA, length(critSS)-length(sevSS)))
+    data.frame(Date = format(yH$icuDate[critSS], "%d/%m"), "Ward beds" = wBeds, "ICU beds" = yH$critical[critSS])
   })
 
 })
